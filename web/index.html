@@ -1,38 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="cagong_map_flutter">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>cagong_map_flutter</title>
-  <link rel="manifest" href="manifest.json">
+  <title>카공여지도</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #map { width: 100%; height: 100%; }
+  </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <div id="map"></div>
+
+  <script>
+    let kakaoMap;
+    let isKakaoMapLoaded = false;
+
+    function loadKakaoMapsScript() {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=0263a29ce4d7869fc8090d309d2bc371';
+        script.async = true;
+        script.onload = () => {
+          isKakaoMapLoaded = true;
+          console.log('Kakao Maps SDK loaded');
+          resolve();
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function initKakaoMap(elementId, lat, lng, level) {
+      if (!isKakaoMapLoaded) {
+        try {
+          await loadKakaoMapsScript();
+        } catch (error) {
+          console.error('Failed to load Kakao Maps SDK:', error);
+          return;
+        }
+      }
+
+      if (typeof kakao === 'undefined' || !kakao.maps) {
+        console.error('Kakao Maps SDK not properly loaded');
+        return;
+      }
+
+      const container = document.getElementById(elementId);
+      const options = {
+        center: new kakao.maps.LatLng(lat, lng),
+        level: level
+      };
+      kakaoMap = new kakao.maps.Map(container, options);
+      console.log('Map created successfully');
+
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onMapCreated');
+      }
+    }
+
+    function moveToLocation(lat, lng) {
+      if (kakaoMap) {
+        kakaoMap.setCenter(new kakao.maps.LatLng(lat, lng));
+      }
+    }
+
+    function addMarker(lat, lng, title) {
+      if (kakaoMap) {
+        const markerPosition = new kakao.maps.LatLng(lat, lng);
+        const marker = new kakao.maps.Marker({
+          position: markerPosition,
+          map: kakaoMap
+        });
+
+        if (title) {
+          const infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="padding:5px;">' + title + '</div>'
+          });
+          kakao.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(kakaoMap, marker);
+          });
+        }
+      }
+    }
+
+    // 초기 로드 시도
+    loadKakaoMapsScript().catch(console.error);
+  </script>
+
+  <script src="main.dart.js" defer></script>
 </body>
 </html>

@@ -30,6 +30,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+    <meta-data
+        android:name="com.kakao.sdk.AppKey"
+        android:value="0263a29ce4d7869fc8090d309d2bc371"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

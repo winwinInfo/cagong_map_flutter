@@ -9,11 +9,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.2
+  http: ^0.13.3
+  provider: ^6.0.0
+  webview_flutter: ^2.0.13
+  geolocator: ^8.0.0
+  youtube_player_flutter: ^8.1.2
+  url_launcher: ^6.1.10
+  js: ^0.6.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
+  assets:
+  - assets/cafe_info.json
+  - assets/images/map_icon.png
+  - assets/kakao_map.html
